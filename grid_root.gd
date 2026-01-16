@@ -324,6 +324,12 @@ func _load_games(path: String, extensions: Array[String]) -> Array[Dictionary]:
 		games.append({"name": name, "file": path.path_join(file)})
 	dir.list_dir_end()
 
+	games.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		var name_a: String = str(a.get("name", "")).to_lower()
+		var name_b: String = str(b.get("name", "")).to_lower()
+		return name_a < name_b
+	)
+
 	return games
 
 func _set_selected(index: int) -> void:

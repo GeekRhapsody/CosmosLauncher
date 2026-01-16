@@ -5,167 +5,223 @@
     <emulator>RetroArch</emulator>
     <path>/home/claudio/mounts/roms/Nintendo Game Boy</path>
     <model>res://models/gameboy/scene.gltf</model>
+    <extensions>gb,zip,7z</extensions>
+    <launch></launch>
   </system>
   <system>
     <name>Game Boy Color</name>
     <emulator>RetroArch</emulator>
-    <path>res://roms/Nintendo Game Boy Color</path>
+    <path>%rootfolder%/Nintendo Game Boy Color</path>
     <model>res://models/game_boy_color.tscn</model>
+    <extensions>gbc,zip,7z</extensions>
+    <launch></launch>
   </system>
   <system>
     <name>Game Boy Advanced</name>
     <emulator>RetroArch</emulator>
-    <path>res://roms/Nintendo Game Boy Advanced</path>
+    <path>%rootfolder%/Nintendo Game Boy Advanced</path>
     <model>res://models/game_boy_advance.tscn</model>
+    <extensions>gba,zip,7z</extensions>
+    <launch></launch>
   </system>  
   <system>
     <name>Nintendo DS</name>
     <emulator>RetroArch</emulator>
-    <path>res://roms/Nintendo DS</path>
+    <path>%rootfolder%/Nintendo DS</path>
     <model>res://models/nintendo_ds.tscn</model>
+    <extensions>nds,zip,7z</extensions>
+    <launch></launch>
   </system>
   <system>
     <name>Nintendo 3DS</name>
     <emulator>RetroArch</emulator>
-    <path>res://roms/Nintendo 3DS</path>
+    <path>%rootfolder%/Nintendo 3DS</path>
     <model>res://models/nintendo_3ds.tscn</model>
+    <extensions>3ds,cia,zip,7z</extensions>
+    <launch></launch>
   </system>
   <system>
     <name>Sega Dreamcast</name>
     <emulator>Flycast</emulator>
-    <path>res://roms/Sega Dreamcast</path>
+    <path>%rootfolder%/Sega Dreamcast</path>
     <model>res://models/sega_dreamcast.tscn</model>
+    <extensions>gdi,cdi,chd,zip,7z</extensions>
+    <launch></launch>
   </system>
   <system>
     <name>Sega Game Gear</name>
     <emulator>RetroArch</emulator>
-    <path>res://roms/Sega Game Gear</path>
+    <path>%rootfolder%/Sega Game Gear</path>
     <model>res://models/sega_game_gear.tscn</model>
+    <extensions>gg,zip,7z</extensions>
+    <launch></launch>
   </system>
   <system>
     <name>Sega Master System</name>
     <emulator>RetroArch</emulator>
-    <path>res://roms/Sega Master System</path>
+    <path>%rootfolder%/Sega Master System</path>
     <model>res://models/sega_master_system.tscn</model>
+    <extensions>sms,zip,7z</extensions>
+    <launch></launch>
   </system>
   <system>
     <name>Sega Saturn</name>
     <emulator>Yaba Sanshiro</emulator>
-    <path>res://roms/Sega Saturn</path>
+    <path>%rootfolder%/Sega Saturn</path>
     <model>res://models/sega_saturn.tscn</model>
+    <extensions>bin,cue,iso,chd,zip,7z</extensions>
+    <launch></launch>
   </system>
   <system>
     <name>Sony PlayStation Portable</name>
     <emulator>PPSSPP</emulator>
-    <path>res://roms/Sony PSP</path>
+    <path>%rootfolder%/Sony PSP</path>
     <model>res://models/sony_psp.tscn</model>
+    <extensions>iso,cso,pbp,zip,7z</extensions>
+    <launch></launch>
   </system>
   <system>
     <name>Microsoft MS-DOS</name>
     <emulator>DOSBox</emulator>
-    <path>res://roms/MS-DOS</path>
+    <path>%rootfolder%/MS-DOS</path>
     <model>res://models/msdos.tscn</model>
+    <extensions>exe,bat,com,zip,7z</extensions>
+    <launch></launch>
   </system>
   <system>
     <name>Commodore Amiga</name>
     <emulator>FS-UAE</emulator>
-    <path>res://roms/Commodore Amiga</path>
+    <path>%rootfolder%/Commodore Amiga</path>
     <model>res://models/commodore_amiga.tscn</model>
+    <extensions>adf,hdf,lha,zip,7z</extensions>
+    <launch></launch>
   </system>
   <system>
     <name>Commodore 64</name>
     <emulator>VICE</emulator>
-    <path>res://roms/Commodore 64</path>
+    <path>%rootfolder%/Commodore 64</path>
     <model>res://models/commodore_64.tscn</model>
+    <extensions>d64,t64,prg,zip,7z</extensions>
+    <launch></launch>
   </system>
   <system>
     <name>Arcade</name>
     <emulator>MAME</emulator>
-    <path>res://roms/Arcade</path>
+    <path>%rootfolder%/Arcade</path>
     <model>res://models/arcade.tscn</model>
+    <extensions>zip,7z</extensions>
+    <launch></launch>
   </system>
   <system>
     <name>Atari 5200</name>
     <emulator>RetroArch</emulator>
-    <path>res://roms/Atari 5200</path>
+    <path>%rootfolder%/Atari 5200</path>
     <model>res://models/atari_5200.tscn</model>
+    <extensions>a52,zip,7z</extensions>
+    <launch></launch>
   </system>
   <system>
     <name>Atari 7800</name>
     <emulator>RetroArch</emulator>
-    <path>res://roms/Atari 7800</path>
+    <path>%rootfolder%/Atari 7800</path>
     <model>res://models/atari_7800.tscn</model>
+    <extensions>a78,zip,7z</extensions>
+    <launch></launch>
   </system>
   <system>
     <name>Atari Jaguar</name>
     <emulator>RetroArch</emulator>
-    <path>res://roms/Atari Jaguar</path>
+    <path>%rootfolder%/Atari Jaguar</path>
     <model>res://models/atari_jaguar.tscn</model>
+    <extensions>j64,jag,zip,7z</extensions>
+    <launch></launch>
   </system>
   <system>
     <name>Atari Lynx</name>
     <emulator>RetroArch</emulator>
-    <path>res://roms/Atari Lynx</path>
+    <path>%rootfolder%/Atari Lynx</path>
     <model>res://models/atari_lynx.tscn</model>
+    <extensions>lnx,zip,7z</extensions>
+    <launch></launch>
   </system>
   <system>
     <name>Atari ST</name>
     <emulator>Hatari</emulator>
-    <path>res://roms/Atari ST</path>
+    <path>%rootfolder%/Atari ST</path>
     <model>res://models/atari_st.tscn</model>
+    <extensions>st,stx,msa,zip,7z</extensions>
+    <launch></launch>
   </system>
   <system>
     <name>NES</name>
     <emulator>RetroArch</emulator>
-    <path>res://roms/nes</path>
+    <path>%rootfolder%/nes</path>
     <model>res://models/nes.tscn</model>
+    <extensions>nes,zip,7z</extensions>
+    <launch></launch>
   </system>
   <system>
-    <name>SNES</name>
+    <name>Super Nintendo</name>
     <emulator>RetroArch</emulator>
-    <path>res://roms/snes</path>
+    <path>%rootfolder%/Nintendo SNES</path>
     <model>res://models/snes.tscn</model>
+    <extensions>sfc,smc,zip,7z</extensions>
+    <launch>~/Applications/RetroArch-Linux-x86_64.AppImage -L ~/.config/retroarch/cores/snes9x_libretro.so %ROM%</launch>
   </system>
   <system>
     <name>Nintendo GameCube</name>
     <emulator>RetroArch</emulator>
-    <path>res://roms/gc</path>
+    <path>%rootfolder%/gc</path>
     <model>res://models/gamecube.tscn</model>
+    <extensions>iso,gcm,zip,7z</extensions>
+    <launch></launch>
   </system>    
   <system>
     <name>Nintendo Wii</name>
     <emulator>RetroArch</emulator>
-    <path>res://roms/wii</path>
+    <path>%rootfolder%/wii</path>
     <model>res://models/wii.tscn</model>
+    <extensions>iso,wbfs,zip,7z</extensions>
+    <launch></launch>
   </system>  
   <system>
     <name>Mega Drive</name>
     <emulator>Kega Fusion</emulator>
-    <path>res://roms/Sega Mega Drive</path>
+    <path>%rootfolder%/Sega Mega Drive</path>
     <model>res://models/megadrive/scene.gltf</model>
+    <extensions>md,gen,bin,zip,7z</extensions>
+    <launch></launch>
   </system>
   <system>
     <name>PlayStation</name>
     <emulator>DuckStation</emulator>
-    <path>res://roms/ps1</path>
+    <path>%rootfolder%/ps1</path>
     <model>res://models/playstation.tscn</model>
+    <extensions>bin,cue,iso,chd,zip,7z</extensions>
+    <launch></launch>
   </system>
   <system>
     <name>PlayStation 2</name>
     <emulator>DuckStation</emulator>
-    <path>res://roms/ps2</path>
+    <path>%rootfolder%/ps2</path>
     <model>res://models/playstation_2.tscn</model>
+    <extensions>iso,bin,chd,zip,7z</extensions>
+    <launch></launch>
   </system>  
   <system>
     <name>Nintendo 64</name>
     <emulator>Mupen64Plus</emulator>
-    <path>res://roms/n64</path>
+    <path>%rootfolder%/n64</path>
     <model>res://models/n64.tscn</model>
+    <extensions>n64,z64,v64,zip,7z</extensions>
+    <launch></launch>
   </system>
   <system>
     <name>Nintendo Switch</name>
     <emulator>Eden</emulator>
-    <path>res://roms/Nintendo Switch</path>
+    <path>%rootfolder%/Nintendo Switch</path>
     <model>res://models/switch/scene.gltf</model>
+    <extensions>xci,nsp,zip,7z</extensions>
+    <launch></launch>
   </system>
 </systems>

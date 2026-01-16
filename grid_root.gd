@@ -7,29 +7,49 @@ extends Node3D
 @export var selected_spin_speed := 0.6
 @export var deselect_return_time := 0.2
 @export var model_fit_ratio := 0.8
+@export var fade_duration: float = 0.35
+@export var game_box_size: Vector3 = Vector3(0.9, 1.2, 0.2)
 @export var systems_path := "res://systems.xml"
 @export var camera_path := NodePath("Camera3D")
 @export var camera_margin := 0.4
 @export var selected_label_path := NodePath("UILayer/SelectedLabel")
 
 @onready var grid_container: Node3D = $GridContainer
+@onready var game_grid_container: Node3D = $GameGridContainer
 @onready var grid_camera: Camera3D = get_node_or_null(camera_path)
 @onready var selected_label: Label = get_node_or_null(selected_label_path)
 
 var grid_cubes: Array[Node3D] = []
 var grid_base_rotations: Array[Vector3] = []
 var grid_base_scales: Array[Vector3] = []
+var game_nodes: Array[Node3D] = []
+var game_base_rotations: Array[Vector3] = []
+var game_base_scales: Array[Vector3] = []
 var selected_index: int = -1
+var game_selected_index: int = -1
 var total_systems: int = 0
 var grid_columns: int = 1
 var grid_rows: int = 0
 var grid_systems: Array[Dictionary] = []
+var game_total: int = 0
+var game_rows: int = 0
+var game_columns: int = 1
+var game_list: Array[Dictionary] = []
+var showing_games: bool = false
+var is_transitioning: bool = false
+var current_system: Dictionary = {}
+var rom_root: String = ""
 
 func _ready() -> void:
+	_load_config()
 	_build_grid()
 
 func _build_grid() -> void:
 	_clear_grid()
+	_clear_game_grid()
+	grid_container.visible = true
+	game_grid_container.visible = false
+	showing_games = false
 	var resolved_path := _resolve_systems_path()
 	var systems: Array[Dictionary] = _load_systems(resolved_path)
 	var had_systems := not systems.is_empty()
@@ -75,6 +95,17 @@ func _clear_grid() -> void:
 	if selected_label != null:
 		selected_label.text = ""
 
+func _clear_game_grid() -> void:
+	for child in game_grid_container.get_children():
+		child.queue_free()
+	game_nodes.clear()
+	game_base_rotations.clear()
+	game_base_scales.clear()
+	game_list.clear()
+	game_selected_index = -1
+	game_total = 0
+	game_rows = 0
+
 func _spawn_system_node(system: Dictionary, position: Vector3) -> Node3D:
 	var root := Node3D.new()
 	root.position = position
@@ -110,6 +141,178 @@ func _add_fallback_cube(root: Node3D) -> void:
 	cube.mesh = mesh
 	root.add_child(cube)
 
+func _build_game_grid(system: Dictionary) -> void:
+	_clear_game_grid()
+	var system_name: String = str(system.get("name", ""))
+	var system_path: String = _get_system_path(system)
+	var extensions: Array[String] = _parse_extensions(str(system.get("extensions", "")))
+	var games: Array[Dictionary] = _load_games(system_path, extensions)
+	if games.is_empty():
+		push_warning("No games found in %s" % system_path)
+		return
+	game_list = games
+
+	var safe_columns: int = int(max(columns, 1))
+	var rows: int = int(ceil(float(games.size()) / float(safe_columns)))
+	var total_width: float = float(safe_columns - 1) * spacing
+	var total_height: float = float(rows - 1) * spacing
+	var start_x: float = -total_width / 2.0
+	var start_y: float = total_height / 2.0
+
+	game_columns = safe_columns
+	game_rows = rows
+	game_total = games.size()
+
+	for i in range(games.size()):
+		var row: int = int(i / safe_columns)
+		var col: int = i % safe_columns
+		var pos := Vector3(start_x + float(col) * spacing, start_y - float(row) * spacing, 0.0)
+		var game_node: Node3D = _spawn_game_node(games[i], system_name, pos)
+		game_nodes.append(game_node)
+
+	if game_total > 0:
+		_set_game_selected(0)
+
+	_frame_camera(total_width, total_height)
+
+func _spawn_game_node(game: Dictionary, system_name: String, position: Vector3) -> Node3D:
+	var root := Node3D.new()
+	root.position = position
+	root.scale = Vector3.ONE
+	root.name = "Game_%s" % str(game.get("name", "Game"))
+	game_grid_container.add_child(root)
+
+	var game_name: String = str(game.get("name", ""))
+	var box := _create_game_box(system_name, game_name)
+	root.add_child(box)
+
+	_fit_model_to_cell(root)
+	game_base_rotations.append(root.rotation)
+	game_base_scales.append(root.scale)
+	return root
+
+func _create_game_box(system_name: String, game_name: String) -> Node3D:
+	var root := Node3D.new()
+	var size: Vector3 = game_box_size
+	var half_w: float = size.x * 0.5
+	var half_h: float = size.y * 0.5
+	var half_d: float = size.z * 0.5
+
+	var front_tex: Texture2D = _load_game_texture(system_name, "Front", game_name)
+	var spine_tex: Texture2D = _load_game_texture(system_name, "Spine", game_name)
+	var back_tex: Texture2D = _load_game_texture(system_name, "Back", game_name)
+
+	var front_mat: StandardMaterial3D = _create_box_material(front_tex)
+	var spine_mat: StandardMaterial3D = _create_box_material(spine_tex)
+	var back_mat: StandardMaterial3D = _create_box_material(back_tex)
+	var gray_mat: StandardMaterial3D = _create_box_material(null)
+
+	_add_game_face(root, Vector2(size.x, size.y), Vector3(0, 0, half_d), Vector3(0, 0, 0), front_mat)
+	_add_game_face(root, Vector2(size.x, size.y), Vector3(0, 0, -half_d), Vector3(0, 180, 0), back_mat)
+	_add_game_face(root, Vector2(size.z, size.y), Vector3(-half_w, 0, 0), Vector3(0, -90, 0), spine_mat)
+	_add_game_face(root, Vector2(size.z, size.y), Vector3(half_w, 0, 0), Vector3(0, 90, 0), gray_mat)
+	_add_game_face(root, Vector2(size.x, size.z), Vector3(0, half_h, 0), Vector3(-90, 0, 0), gray_mat)
+	_add_game_face(root, Vector2(size.x, size.z), Vector3(0, -half_h, 0), Vector3(90, 0, 0), gray_mat)
+
+	return root
+
+func _add_game_face(root: Node3D, size: Vector2, position: Vector3, rotation_deg: Vector3, material: Material) -> void:
+	var quad: QuadMesh = QuadMesh.new()
+	quad.size = size
+	var face: MeshInstance3D = MeshInstance3D.new()
+	face.mesh = quad
+	face.material_override = material
+	face.position = position
+	face.rotation_degrees = rotation_deg
+	root.add_child(face)
+
+func _create_box_material(texture: Texture2D) -> StandardMaterial3D:
+	var material: StandardMaterial3D = StandardMaterial3D.new()
+	if texture != null:
+		material.albedo_texture = texture
+		material.albedo_color = Color(1, 1, 1, 1)
+	else:
+		material.albedo_color = Color(0.4, 0.4, 0.4, 1)
+	return material
+
+func _load_game_texture(system_name: String, face: String, game_name: String) -> Texture2D:
+	var assets_root: String = _resolve_assets_root()
+	var system_folder: String = assets_root.path_join(system_name)
+	var face_folder: String = system_folder.path_join(face)
+	var file_name: String = "%s.png" % game_name
+	var texture_path: String = face_folder.path_join(file_name)
+	return _load_texture(texture_path)
+
+func _load_texture(path: String) -> Texture2D:
+	if not FileAccess.file_exists(path):
+		return null
+	var image: Image = Image.new()
+	var err: int = image.load(path)
+	if err != OK:
+		return null
+	var texture: Texture2D = ImageTexture.create_from_image(image)
+	return texture
+
+func _resolve_assets_root() -> String:
+	var exe_dir: String = OS.get_executable_path().get_base_dir()
+	var external_assets: String = exe_dir.path_join("assets")
+	if DirAccess.dir_exists_absolute(external_assets):
+		return external_assets
+	return "res://assets"
+
+func _get_system_path(system: Dictionary) -> String:
+	if system.has("path"):
+		return _expand_path(_apply_root_folder(str(system.get("path", ""))))
+	if system.has("folder"):
+		return _expand_path(_apply_root_folder(str(system.get("folder", ""))))
+	if system.has("folder_path"):
+		return _expand_path(_apply_root_folder(str(system.get("folder_path", ""))))
+	return ""
+
+func _parse_extensions(raw: String) -> Array[String]:
+	var items: Array[String] = []
+	if raw == "":
+		return items
+
+	var parts: PackedStringArray = raw.split(",", false)
+	for part in parts:
+		var ext: String = part.strip_edges().to_lower()
+		if ext == "":
+			continue
+		if ext.begins_with("."):
+			ext = ext.substr(1)
+		items.append(ext)
+	return items
+
+func _load_games(path: String, extensions: Array[String]) -> Array[Dictionary]:
+	if path == "":
+		return []
+	var dir: DirAccess = DirAccess.open(path)
+	if dir == null:
+		push_warning("Unable to open game path: %s" % path)
+		return []
+
+	var games: Array[Dictionary] = []
+	var filter_extensions: bool = not extensions.is_empty()
+	dir.list_dir_begin()
+	while true:
+		var file: String = dir.get_next()
+		if file == "":
+			break
+		if dir.current_is_dir():
+			continue
+		if file.begins_with("."):
+			continue
+		if filter_extensions:
+			var ext: String = file.get_extension().to_lower()
+			if ext == "" or not extensions.has(ext):
+				continue
+		var name: String = file.get_basename()
+		games.append({"name": name, "file": path.path_join(file)})
+	dir.list_dir_end()
+
+	return games
+
 func _set_selected(index: int) -> void:
 	if total_systems <= 0:
 		return
@@ -122,7 +325,7 @@ func _set_selected(index: int) -> void:
 	selected_index = clamped_index
 	if selected_index < grid_cubes.size():
 		grid_cubes[selected_index].scale = _get_base_scale(selected_index) * selected_scale
-		_update_selected_label(selected_index)
+		_update_system_label(selected_index)
 
 func _move_selection(delta_col: int, delta_row: int) -> void:
 	if total_systems <= 0:
@@ -141,7 +344,216 @@ func _move_selection(delta_col: int, delta_row: int) -> void:
 
 	_set_selected(new_index)
 
+func _set_game_selected(index: int) -> void:
+	if game_total <= 0:
+		return
+
+	var clamped_index: int = int(clamp(index, 0, game_total - 1))
+	if game_selected_index >= 0 and game_selected_index < game_nodes.size():
+		game_nodes[game_selected_index].scale = _get_game_base_scale(game_selected_index)
+		_reset_game_rotation(game_selected_index)
+
+	game_selected_index = clamped_index
+	if game_selected_index < game_nodes.size():
+		game_nodes[game_selected_index].scale = _get_game_base_scale(game_selected_index) * selected_scale
+		_update_game_label(game_selected_index)
+
+func _move_game_selection(delta_col: int, delta_row: int) -> void:
+	if game_total <= 0:
+		return
+	if game_selected_index < 0:
+		_set_game_selected(0)
+		return
+
+	var row: int = int(game_selected_index / game_columns)
+	var col: int = game_selected_index % game_columns
+	var new_row: int = int(clamp(row + delta_row, 0, max(game_rows - 1, 0)))
+	var new_col: int = int(clamp(col + delta_col, 0, game_columns - 1))
+	var new_index: int = int(new_row * game_columns + new_col)
+	if new_index >= game_total:
+		new_index = game_total - 1
+
+	_set_game_selected(new_index)
+
+func _launch_selected_game() -> void:
+	if game_selected_index < 0 or game_selected_index >= game_list.size():
+		return
+
+	var rom_path: String = str(game_list[game_selected_index].get("file", ""))
+	if rom_path == "":
+		push_warning("Selected game has no file path.")
+		return
+
+	var launch_cmd: String = str(current_system.get("launch", ""))
+	if launch_cmd.strip_edges() == "":
+		push_warning("No launch command configured for this system.")
+		return
+
+	var tokens: Array[String] = _split_command(launch_cmd)
+	if tokens.is_empty():
+		push_warning("Launch command is empty or invalid.")
+		return
+
+	var expanded_rom: String = _expand_path(rom_path)
+	var has_rom: bool = false
+	for i in range(tokens.size()):
+		var token: String = tokens[i]
+		if token.find("%ROM%") != -1:
+			tokens[i] = token.replace("%ROM%", expanded_rom)
+			has_rom = true
+
+	if not has_rom:
+		push_warning("Launch command must include %ROM% placeholder.")
+		return
+
+	for i in range(tokens.size()):
+		tokens[i] = _expand_path(_apply_root_folder(tokens[i]))
+
+	var exec_path: String = tokens[0]
+	if _looks_like_path(exec_path) and not FileAccess.file_exists(exec_path):
+		push_error("Executable not found: %s" % exec_path)
+		return
+	var args: Array[String] = []
+	for i in range(1, tokens.size()):
+		args.append(tokens[i])
+
+	print("Launching:", exec_path, "Args:", args)
+	var pid: int = OS.create_process(exec_path, args)
+	if pid == -1:
+		push_error("Failed to launch: %s" % exec_path)
+
+func _split_command(command: String) -> Array[String]:
+	var tokens: Array[String] = []
+	var current: String = ""
+	var in_quotes: bool = false
+	var quote_char: String = ""
+	var escape: bool = false
+
+	for i in range(command.length()):
+		var ch: String = command.substr(i, 1)
+		if escape:
+			current += ch
+			escape = false
+			continue
+		if ch == "\\":
+			escape = true
+			continue
+		if in_quotes:
+			if ch == quote_char:
+				in_quotes = false
+			else:
+				current += ch
+			continue
+		if ch == "\"" or ch == "'":
+			in_quotes = true
+			quote_char = ch
+			continue
+		if _is_whitespace(ch):
+			if current != "":
+				tokens.append(current)
+				current = ""
+			continue
+		current += ch
+
+	if current != "":
+		tokens.append(current)
+
+	return tokens
+
+func _is_whitespace(ch: String) -> bool:
+	return ch == " " or ch == "\t" or ch == "\n" or ch == "\r"
+
+func _expand_path(path: String) -> String:
+	var expanded: String = path
+	if expanded.begins_with("res://") or expanded.begins_with("user://"):
+		return ProjectSettings.globalize_path(expanded)
+	if expanded.begins_with("~"):
+		var home: String = OS.get_environment("HOME")
+		if home != "":
+			expanded = home + expanded.substr(1)
+	if expanded.find("$HOME") != -1:
+		var home_env: String = OS.get_environment("HOME")
+		if home_env != "":
+			expanded = expanded.replace("$HOME", home_env)
+	return expanded
+
+func _looks_like_path(value: String) -> bool:
+	return value.find("/") != -1 or value.find("\\") != -1
+
+func _apply_root_folder(path: String) -> String:
+	var token: String = "%rootfolder%"
+	var lower: String = path.to_lower()
+	if lower.begins_with(token):
+		if rom_root == "":
+			push_warning("Root folder is not set in config.cfg.")
+			return path.replace("%rootfolder%", "").replace("%ROOTFOLDER%", "")
+		var remainder: String = path.substr(token.length())
+		if remainder.begins_with("/") or remainder.begins_with("\\"):
+			remainder = remainder.substr(1)
+		return rom_root.path_join(remainder)
+	if path.find("%rootfolder%") != -1 or path.find("%ROOTFOLDER%") != -1:
+		if rom_root != "":
+			return path.replace("%rootfolder%", rom_root).replace("%ROOTFOLDER%", rom_root)
+		push_warning("Root folder is not set in config.cfg.")
+	return path
+
+func _load_config() -> void:
+	var config_path: String = _resolve_config_path()
+	var config: ConfigFile = ConfigFile.new()
+	if not FileAccess.file_exists(config_path):
+		_write_default_config(config_path)
+	var err: int = config.load(config_path)
+	if err != OK:
+		push_error("Failed to load config: %s (err %s)" % [config_path, err])
+		return
+	var root_value: String = str(config.get_value("paths", "root_folder", ""))
+	rom_root = _expand_path(root_value.strip_edges())
+
+func _resolve_config_path() -> String:
+	var exe_dir: String = OS.get_executable_path().get_base_dir()
+	var external: String = exe_dir.path_join("config.cfg")
+	if FileAccess.file_exists(external):
+		return external
+	if FileAccess.file_exists("user://config.cfg"):
+		return "user://config.cfg"
+	if FileAccess.file_exists("res://config.cfg"):
+		return "res://config.cfg"
+	return "user://config.cfg"
+
+func _write_default_config(path: String) -> void:
+	if path.begins_with("res://"):
+		return
+	var config: ConfigFile = ConfigFile.new()
+	config.set_value("paths", "root_folder", "/path/to/roms")
+	config.save(path)
+
 func _unhandled_input(event: InputEvent) -> void:
+	if is_transitioning:
+		return
+
+	if event.is_action_pressed("ui_cancel"):
+		if showing_games:
+			_return_to_systems()
+		return
+
+	if event.is_action_pressed("ui_accept"):
+		if showing_games:
+			_launch_selected_game()
+		else:
+			_enter_selected_system()
+		return
+
+	if showing_games:
+		if event.is_action_pressed("ui_left"):
+			_move_game_selection(-1, 0)
+		elif event.is_action_pressed("ui_right"):
+			_move_game_selection(1, 0)
+		elif event.is_action_pressed("ui_up"):
+			_move_game_selection(0, -1)
+		elif event.is_action_pressed("ui_down"):
+			_move_game_selection(0, 1)
+		return
+
 	if event.is_action_pressed("ui_left"):
 		_move_selection(-1, 0)
 	elif event.is_action_pressed("ui_right"):
@@ -151,7 +563,79 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("ui_down"):
 		_move_selection(0, 1)
 
+func _enter_selected_system() -> void:
+	if selected_index < 0 or selected_index >= grid_systems.size():
+		return
+	if is_transitioning:
+		return
+
+	var system: Dictionary = grid_systems[selected_index]
+	_transition_to_games(system)
+
+func _transition_to_games(system: Dictionary) -> void:
+	is_transitioning = true
+	showing_games = true
+	current_system = system
+	_fade_grid(grid_container, 1.0, fade_duration)
+	await get_tree().create_timer(fade_duration).timeout
+	grid_container.visible = false
+
+	_build_game_grid(system)
+	game_grid_container.visible = true
+	_set_grid_transparency(game_grid_container, 1.0)
+	_fade_grid(game_grid_container, 0.0, fade_duration)
+	await get_tree().create_timer(fade_duration).timeout
+	is_transitioning = false
+
+func _return_to_systems() -> void:
+	if is_transitioning:
+		return
+	_transition_to_systems()
+
+func _transition_to_systems() -> void:
+	is_transitioning = true
+	_fade_grid(game_grid_container, 1.0, fade_duration)
+	await get_tree().create_timer(fade_duration).timeout
+	game_grid_container.visible = false
+	showing_games = false
+	current_system = {}
+	_clear_game_grid()
+
+	grid_container.visible = true
+	_set_grid_transparency(grid_container, 1.0)
+	_fade_grid(grid_container, 0.0, fade_duration)
+	_update_system_label(selected_index)
+	await get_tree().create_timer(fade_duration).timeout
+	is_transitioning = false
+
+func _fade_grid(root: Node3D, target_alpha: float, duration: float) -> void:
+	var meshes: Array[GeometryInstance3D] = _collect_geometry(root)
+	for mesh in meshes:
+		var tween: Tween = mesh.create_tween()
+		tween.tween_property(mesh, "transparency", target_alpha, duration)
+
+func _set_grid_transparency(root: Node3D, alpha: float) -> void:
+	var meshes: Array[GeometryInstance3D] = _collect_geometry(root)
+	for mesh in meshes:
+		mesh.transparency = alpha
+
+func _collect_geometry(root: Node) -> Array[GeometryInstance3D]:
+	var result: Array[GeometryInstance3D] = []
+	var stack: Array[Node] = [root]
+	while not stack.is_empty():
+		var node: Node = stack.pop_back()
+		if node is GeometryInstance3D:
+			result.append(node as GeometryInstance3D)
+		for child in node.get_children():
+			var child_node: Node = child
+			stack.append(child_node)
+	return result
+
 func _process(delta: float) -> void:
+	if showing_games:
+		if game_selected_index >= 0 and game_selected_index < game_nodes.size():
+			game_nodes[game_selected_index].rotate_y(selected_spin_speed * delta)
+		return
 	if selected_index >= 0 and selected_index < grid_cubes.size():
 		grid_cubes[selected_index].rotate_y(selected_spin_speed * delta)
 
@@ -171,8 +655,24 @@ func _reset_rotation(index: int) -> void:
 	var tween := node.create_tween()
 	tween.tween_property(node, "rotation", base_rot, deselect_return_time)
 
+func _reset_game_rotation(index: int) -> void:
+	if index < 0 or index >= game_nodes.size() or index >= game_base_rotations.size():
+		return
+
+	var node := game_nodes[index]
+	if not is_instance_valid(node):
+		return
+
+	var base_rot := game_base_rotations[index]
+	if deselect_return_time <= 0.0:
+		node.rotation = base_rot
+		return
+
+	var tween := node.create_tween()
+	tween.tween_property(node, "rotation", base_rot, deselect_return_time)
+
 func _fit_model_to_cell(root: Node3D) -> void:
-	var bounds := _get_model_aabb(root)
+	var bounds: AABB = _get_model_aabb(root)
 	if bounds.size.length() <= 0.0:
 		return
 
@@ -243,13 +743,26 @@ func _get_base_scale(index: int) -> Vector3:
 		return Vector3.ONE
 	return grid_base_scales[index]
 
-func _update_selected_label(index: int) -> void:
+func _get_game_base_scale(index: int) -> Vector3:
+	if index < 0 or index >= game_base_scales.size():
+		return Vector3.ONE
+	return game_base_scales[index]
+
+func _update_system_label(index: int) -> void:
 	if selected_label == null:
 		return
 	if index < 0 or index >= grid_systems.size():
 		selected_label.text = ""
 		return
 	selected_label.text = str(grid_systems[index].get("name", ""))
+
+func _update_game_label(index: int) -> void:
+	if selected_label == null:
+		return
+	if index < 0 or index >= game_list.size():
+		selected_label.text = ""
+		return
+	selected_label.text = str(game_list[index].get("name", ""))
 
 func _frame_camera(total_width: float, total_height: float) -> void:
 	if grid_camera == null:
@@ -313,7 +826,7 @@ func _load_systems(path: String) -> Array[Dictionary]:
 				if name == "system":
 					in_system = true
 					current = {}
-				elif in_system and name in ["name", "emulator", "path", "folder", "folder_path", "model", "model_path"]:
+				elif in_system and name in ["name", "emulator", "path", "folder", "folder_path", "model", "model_path", "extensions", "launch"]:
 					current_key = name
 			XMLParser.NODE_TEXT:
 				if in_system and current_key != "":

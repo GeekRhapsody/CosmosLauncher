@@ -154,6 +154,7 @@ func _build_game_grid(system: Dictionary) -> void:
 	_clear_game_grid()
 	var system_name: String = str(system.get("name", ""))
 	var system_path: String = _get_system_path(system)
+	var box_size: Vector3 = _get_game_box_size(system)
 	var extensions: Array[String] = _parse_extensions(str(system.get("extensions", "")))
 	var games: Array[Dictionary] = _load_games(system_path, extensions)
 	if games.is_empty():
@@ -177,7 +178,7 @@ func _build_game_grid(system: Dictionary) -> void:
 		var row: int = int(i / safe_columns)
 		var col: int = i % safe_columns
 		var pos := Vector3(start_x + float(col) * spacing, start_y - float(row) * spacing, 0.0)
-		var game_node: Node3D = _spawn_game_node(games[i], system_name, pos)
+		var game_node: Node3D = _spawn_game_node(games[i], system_name, pos, box_size)
 		game_nodes.append(game_node)
 
 	if game_total > 0:
@@ -188,7 +189,7 @@ func _build_game_grid(system: Dictionary) -> void:
 	var window_height: float = float(window_rows - 1) * spacing
 	_frame_camera(total_width, window_height)
 
-func _spawn_game_node(game: Dictionary, system_name: String, position: Vector3) -> Node3D:
+func _spawn_game_node(game: Dictionary, system_name: String, position: Vector3, box_size: Vector3) -> Node3D:
 	var root := Node3D.new()
 	root.position = position
 	root.scale = Vector3.ONE
@@ -196,7 +197,7 @@ func _spawn_game_node(game: Dictionary, system_name: String, position: Vector3) 
 	game_grid_container.add_child(root)
 
 	var game_name: String = str(game.get("name", ""))
-	var box := _create_game_box(system_name, game_name)
+	var box := _create_game_box(system_name, game_name, box_size)
 	root.add_child(box)
 
 	_fit_model_to_cell(root)
@@ -204,9 +205,8 @@ func _spawn_game_node(game: Dictionary, system_name: String, position: Vector3) 
 	game_base_scales.append(root.scale)
 	return root
 
-func _create_game_box(system_name: String, game_name: String) -> Node3D:
+func _create_game_box(system_name: String, game_name: String, size: Vector3) -> Node3D:
 	var root := Node3D.new()
-	var size: Vector3 = game_box_size
 	var half_w: float = size.x * 0.5
 	var half_h: float = size.y * 0.5
 	var half_d: float = size.z * 0.5
@@ -228,6 +228,39 @@ func _create_game_box(system_name: String, game_name: String) -> Node3D:
 	_add_game_face(root, Vector2(size.x, size.z), Vector3(0, -half_h, 0), Vector3(90, 0, 0), gray_mat)
 
 	return root
+
+func _get_game_box_size(system: Dictionary) -> Vector3:
+	var height: float = game_box_size.y
+	var width: float = game_box_size.x
+	var depth: float = game_box_size.z
+	var aspect_raw: String = str(system.get("box_aspect", "")).strip_edges()
+	if aspect_raw != "":
+		var ratio: float = _parse_aspect_ratio(aspect_raw)
+		if ratio > 0.0:
+			width = height * ratio
+
+	var thickness_raw: String = str(system.get("box_thickness", "")).strip_edges()
+	if thickness_raw != "":
+		var thickness: float = float(thickness_raw)
+		if thickness > 0.0:
+			depth = thickness
+
+	return Vector3(width, height, depth)
+
+func _parse_aspect_ratio(raw: String) -> float:
+	var trimmed: String = raw.strip_edges().to_lower()
+	if trimmed == "":
+		return 0.0
+	var parts: PackedStringArray = trimmed.split(":", false)
+	if parts.size() != 2:
+		parts = trimmed.split("x", false)
+	if parts.size() != 2:
+		return 0.0
+	var width: float = float(parts[0])
+	var height: float = float(parts[1])
+	if width <= 0.0 or height <= 0.0:
+		return 0.0
+	return width / height
 
 func _add_game_face(root: Node3D, size: Vector2, position: Vector3, rotation_deg: Vector3, material: Material) -> void:
 	var quad: QuadMesh = QuadMesh.new()
@@ -933,7 +966,7 @@ func _load_systems(path: String) -> Array[Dictionary]:
 				if name == "system":
 					in_system = true
 					current = {}
-				elif in_system and name in ["name", "emulator", "path", "folder", "folder_path", "model", "model_path", "extensions", "launch"]:
+				elif in_system and name in ["name", "emulator", "path", "folder", "folder_path", "model", "model_path", "extensions", "launch", "box_aspect", "box_thickness"]:
 					current_key = name
 			XMLParser.NODE_TEXT:
 				if in_system and current_key != "":

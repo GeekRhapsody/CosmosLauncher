@@ -5,6 +5,8 @@
     <emulator>RetroArch</emulator>
     <path>%rootfolder%/Nintendo Game Boy</path>
     <model>res://models/gameboy/scene.gltf</model>
+    <box_aspect>1:1</box_aspect>
+    <box_thickness>0.2</box_thickness>
     <extensions>gb,zip,7z</extensions>
     <launch></launch>
   </system>
@@ -165,6 +167,8 @@
     <emulator>RetroArch</emulator>
     <path>%rootfolder%/Nintendo SNES</path>
     <model>res://models/snes.tscn</model>
+    <box_aspect>4:3</box_aspect>
+    <box_thickness>0.2</box_thickness>    
     <extensions>sfc,smc,zip,7z</extensions>
     <launch>~/Applications/RetroArch-Linux-x86_64.AppImage -L ~/.config/retroarch/cores/snes9x_libretro.so %ROM%</launch>
   </system>
@@ -189,6 +193,8 @@
     <emulator>Kega Fusion</emulator>
     <path>%rootfolder%/Sega Mega Drive</path>
     <model>res://models/megadrive/scene.gltf</model>
+    <box_aspect>3:4</box_aspect>
+    <box_thickness>0.2</box_thickness>
     <extensions>md,gen,bin,zip,7z</extensions>
     <launch></launch>
   </system>

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <systems>
   <system>
-    <name>Game Boy</name>
+    <name>Nintendo Game Boy</name>
     <emulator>RetroArch</emulator>
-    <path>/home/claudio/mounts/roms/Nintendo Game Boy</path>
+    <path>%rootfolder%/Nintendo Game Boy</path>
     <model>res://models/gameboy/scene.gltf</model>
     <extensions>gb,zip,7z</extensions>
     <launch></launch>

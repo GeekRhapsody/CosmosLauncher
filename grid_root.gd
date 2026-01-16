@@ -1,6 +1,7 @@
 extends Node3D
 
-@export var columns := 4
+@export var columns := 5
+@export var visible_rows := 3
 @export var spacing := 2.0
 @export var cube_size := 1.0
 @export var selected_scale := 1.2
@@ -39,6 +40,8 @@ var showing_games: bool = false
 var is_transitioning: bool = false
 var current_system: Dictionary = {}
 var rom_root: String = ""
+var grid_top_row: int = 0
+var game_top_row: int = 0
 
 func _ready() -> void:
 	_load_config()
@@ -70,6 +73,7 @@ func _build_grid() -> void:
 	grid_columns = safe_columns
 	grid_rows = rows
 	total_systems = systems.size()
+	grid_top_row = 0
 
 	for i in range(systems.size()):
 		var row: int = int(i / safe_columns)
@@ -80,7 +84,10 @@ func _build_grid() -> void:
 
 	if total_systems > 0:
 		_set_selected(0)
-	_frame_camera(total_width, total_height)
+	_update_system_scroll_position()
+	var window_rows: int = int(min(grid_rows, max(visible_rows, 1)))
+	var window_height: float = float(window_rows - 1) * spacing
+	_frame_camera(total_width, window_height)
 
 func _clear_grid() -> void:
 	for child in grid_container.get_children():
@@ -92,6 +99,7 @@ func _clear_grid() -> void:
 	selected_index = -1
 	total_systems = 0
 	grid_rows = 0
+	grid_top_row = 0
 	if selected_label != null:
 		selected_label.text = ""
 
@@ -105,6 +113,7 @@ func _clear_game_grid() -> void:
 	game_selected_index = -1
 	game_total = 0
 	game_rows = 0
+	game_top_row = 0
 
 func _spawn_system_node(system: Dictionary, position: Vector3) -> Node3D:
 	var root := Node3D.new()
@@ -162,6 +171,7 @@ func _build_game_grid(system: Dictionary) -> void:
 	game_columns = safe_columns
 	game_rows = rows
 	game_total = games.size()
+	game_top_row = 0
 
 	for i in range(games.size()):
 		var row: int = int(i / safe_columns)
@@ -173,7 +183,10 @@ func _build_game_grid(system: Dictionary) -> void:
 	if game_total > 0:
 		_set_game_selected(0)
 
-	_frame_camera(total_width, total_height)
+	_update_game_scroll_position()
+	var window_rows: int = int(min(game_rows, max(visible_rows, 1)))
+	var window_height: float = float(window_rows - 1) * spacing
+	_frame_camera(total_width, window_height)
 
 func _spawn_game_node(game: Dictionary, system_name: String, position: Vector3) -> Node3D:
 	var root := Node3D.new()
@@ -326,6 +339,7 @@ func _set_selected(index: int) -> void:
 	if selected_index < grid_cubes.size():
 		grid_cubes[selected_index].scale = _get_base_scale(selected_index) * selected_scale
 		_update_system_label(selected_index)
+	_ensure_system_row_visible(int(selected_index / grid_columns))
 
 func _move_selection(delta_col: int, delta_row: int) -> void:
 	if total_systems <= 0:
@@ -336,13 +350,31 @@ func _move_selection(delta_col: int, delta_row: int) -> void:
 
 	var row: int = int(selected_index / grid_columns)
 	var col: int = selected_index % grid_columns
-	var new_row: int = int(clamp(row + delta_row, 0, max(grid_rows - 1, 0)))
-	var new_col: int = int(clamp(col + delta_col, 0, grid_columns - 1))
+	var new_row: int = row
+	var new_col: int = col
+
+	if delta_row != 0:
+		if delta_row > 0:
+			if row >= grid_rows - 1:
+				new_row = 0
+				grid_top_row = 0
+			else:
+				new_row = row + 1
+		else:
+			if row <= 0:
+				new_row = int(max(grid_rows - 1, 0))
+				grid_top_row = int(max(grid_rows - max(visible_rows, 1), 0))
+			else:
+				new_row = row - 1
+	else:
+		new_col = int(clamp(col + delta_col, 0, grid_columns - 1))
+
 	var new_index: int = int(new_row * grid_columns + new_col)
 	if new_index >= total_systems:
 		new_index = total_systems - 1
 
 	_set_selected(new_index)
+	_ensure_system_row_visible(new_row)
 
 func _set_game_selected(index: int) -> void:
 	if game_total <= 0:
@@ -357,6 +389,7 @@ func _set_game_selected(index: int) -> void:
 	if game_selected_index < game_nodes.size():
 		game_nodes[game_selected_index].scale = _get_game_base_scale(game_selected_index) * selected_scale
 		_update_game_label(game_selected_index)
+	_ensure_game_row_visible(int(game_selected_index / game_columns))
 
 func _move_game_selection(delta_col: int, delta_row: int) -> void:
 	if game_total <= 0:
@@ -367,13 +400,31 @@ func _move_game_selection(delta_col: int, delta_row: int) -> void:
 
 	var row: int = int(game_selected_index / game_columns)
 	var col: int = game_selected_index % game_columns
-	var new_row: int = int(clamp(row + delta_row, 0, max(game_rows - 1, 0)))
-	var new_col: int = int(clamp(col + delta_col, 0, game_columns - 1))
+	var new_row: int = row
+	var new_col: int = col
+
+	if delta_row != 0:
+		if delta_row > 0:
+			if row >= game_rows - 1:
+				new_row = 0
+				game_top_row = 0
+			else:
+				new_row = row + 1
+		else:
+			if row <= 0:
+				new_row = int(max(game_rows - 1, 0))
+				game_top_row = int(max(game_rows - max(visible_rows, 1), 0))
+			else:
+				new_row = row - 1
+	else:
+		new_col = int(clamp(col + delta_col, 0, game_columns - 1))
+
 	var new_index: int = int(new_row * game_columns + new_col)
 	if new_index >= game_total:
 		new_index = game_total - 1
 
 	_set_game_selected(new_index)
+	_ensure_game_row_visible(new_row)
 
 func _launch_selected_game() -> void:
 	if game_selected_index < 0 or game_selected_index >= game_list.size():
@@ -670,6 +721,56 @@ func _reset_game_rotation(index: int) -> void:
 
 	var tween := node.create_tween()
 	tween.tween_property(node, "rotation", base_rot, deselect_return_time)
+
+func _ensure_system_row_visible(row: int) -> void:
+	if grid_rows <= 0:
+		return
+	var visible: int = int(max(visible_rows, 1))
+	if grid_rows <= visible:
+		grid_top_row = 0
+		_update_system_scroll_position()
+		return
+	if row < grid_top_row:
+		grid_top_row = row
+	elif row >= grid_top_row + visible:
+		grid_top_row = row - visible + 1
+	grid_top_row = int(clamp(grid_top_row, 0, grid_rows - visible))
+	_update_system_scroll_position()
+
+func _ensure_game_row_visible(row: int) -> void:
+	if game_rows <= 0:
+		return
+	var visible: int = int(max(visible_rows, 1))
+	if game_rows <= visible:
+		game_top_row = 0
+		_update_game_scroll_position()
+		return
+	if row < game_top_row:
+		game_top_row = row
+	elif row >= game_top_row + visible:
+		game_top_row = row - visible + 1
+	game_top_row = int(clamp(game_top_row, 0, game_rows - visible))
+	_update_game_scroll_position()
+
+func _update_system_scroll_position() -> void:
+	if grid_rows <= 0:
+		return
+	var visible: int = int(min(grid_rows, max(visible_rows, 1)))
+	var total_height: float = float(grid_rows - 1) * spacing
+	var start_y: float = total_height / 2.0
+	var center_row: float = float(grid_top_row) + float(visible - 1) * 0.5
+	var center_y: float = start_y - center_row * spacing
+	grid_container.position = Vector3(0.0, -center_y, 0.0)
+
+func _update_game_scroll_position() -> void:
+	if game_rows <= 0:
+		return
+	var visible: int = int(min(game_rows, max(visible_rows, 1)))
+	var total_height: float = float(game_rows - 1) * spacing
+	var start_y: float = total_height / 2.0
+	var center_row: float = float(game_top_row) + float(visible - 1) * 0.5
+	var center_y: float = start_y - center_row * spacing
+	game_grid_container.position = Vector3(0.0, -center_y, 0.0)
 
 func _fit_model_to_cell(root: Node3D) -> void:
 	var bounds: AABB = _get_model_aabb(root)

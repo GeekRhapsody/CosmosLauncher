@@ -1,0 +1,11 @@
+Model Information:
+* title:	Sega Mega Drive
+* source:	https://sketchfab.com/3d-models/sega-mega-drive-47cf3eae9fc3423db22aba119a6a37d5
+* author:	synthetic worlds (https://sketchfab.com/syntheticworlds)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Sega Mega Drive" (https://sketchfab.com/3d-models/sega-mega-drive-47cf3eae9fc3423db22aba119a6a37d5) by synthetic worlds (https://sketchfab.com/syntheticworlds) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

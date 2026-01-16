@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<systems>
+  <system>
+    <name>Game Boy</name>
+    <emulator>RetroArch</emulator>
+    <path>/home/claudio/mounts/roms/Nintendo Game Boy</path>
+    <model>res://models/gameboy/scene.gltf</model>
+  </system>
+  <system>
+    <name>Game Boy Color</name>
+    <emulator>RetroArch</emulator>
+    <path>res://roms/Nintendo Game Boy Color</path>
+    <model>res://models/game_boy_color.tscn</model>
+  </system>
+  <system>
+    <name>Game Boy Advanced</name>
+    <emulator>RetroArch</emulator>
+    <path>res://roms/Nintendo Game Boy Advanced</path>
+    <model>res://models/game_boy_advance.tscn</model>
+  </system>  
+  <system>
+    <name>Nintendo DS</name>
+    <emulator>RetroArch</emulator>
+    <path>res://roms/Nintendo DS</path>
+    <model>res://models/nintendo_ds.tscn</model>
+  </system>
+  <system>
+    <name>Nintendo 3DS</name>
+    <emulator>RetroArch</emulator>
+    <path>res://roms/Nintendo 3DS</path>
+    <model>res://models/nintendo_3ds.tscn</model>
+  </system>
+  <system>
+    <name>Sega Dreamcast</name>
+    <emulator>Flycast</emulator>
+    <path>res://roms/Sega Dreamcast</path>
+    <model>res://models/sega_dreamcast.tscn</model>
+  </system>
+  <system>
+    <name>Sega Game Gear</name>
+    <emulator>RetroArch</emulator>
+    <path>res://roms/Sega Game Gear</path>
+    <model>res://models/sega_game_gear.tscn</model>
+  </system>
+  <system>
+    <name>Sega Master System</name>
+    <emulator>RetroArch</emulator>
+    <path>res://roms/Sega Master System</path>
+    <model>res://models/sega_master_system.tscn</model>
+  </system>
+  <system>
+    <name>Sega Saturn</name>
+    <emulator>Yaba Sanshiro</emulator>
+    <path>res://roms/Sega Saturn</path>
+    <model>res://models/sega_saturn.tscn</model>
+  </system>
+  <system>
+    <name>Sony PlayStation Portable</name>
+    <emulator>PPSSPP</emulator>
+    <path>res://roms/Sony PSP</path>
+    <model>res://models/sony_psp.tscn</model>
+  </system>
+  <system>
+    <name>Microsoft MS-DOS</name>
+    <emulator>DOSBox</emulator>
+    <path>res://roms/MS-DOS</path>
+    <model>res://models/msdos.tscn</model>
+  </system>
+  <system>
+    <name>Commodore Amiga</name>
+    <emulator>FS-UAE</emulator>
+    <path>res://roms/Commodore Amiga</path>
+    <model>res://models/commodore_amiga.tscn</model>
+  </system>
+  <system>
+    <name>Commodore 64</name>
+    <emulator>VICE</emulator>
+    <path>res://roms/Commodore 64</path>
+    <model>res://models/commodore_64.tscn</model>
+  </system>
+  <system>
+    <name>Arcade</name>
+    <emulator>MAME</emulator>
+    <path>res://roms/Arcade</path>
+    <model>res://models/arcade.tscn</model>
+  </system>
+  <system>
+    <name>Atari 5200</name>
+    <emulator>RetroArch</emulator>
+    <path>res://roms/Atari 5200</path>
+    <model>res://models/atari_5200.tscn</model>
+  </system>
+  <system>
+    <name>Atari 7800</name>
+    <emulator>RetroArch</emulator>
+    <path>res://roms/Atari 7800</path>
+    <model>res://models/atari_7800.tscn</model>
+  </system>
+  <system>
+    <name>Atari Jaguar</name>
+    <emulator>RetroArch</emulator>
+    <path>res://roms/Atari Jaguar</path>
+    <model>res://models/atari_jaguar.tscn</model>
+  </system>
+  <system>
+    <name>Atari Lynx</name>
+    <emulator>RetroArch</emulator>
+    <path>res://roms/Atari Lynx</path>
+    <model>res://models/atari_lynx.tscn</model>
+  </system>
+  <system>
+    <name>Atari ST</name>
+    <emulator>Hatari</emulator>
+    <path>res://roms/Atari ST</path>
+    <model>res://models/atari_st.tscn</model>
+  </system>
+  <system>
+    <name>NES</name>
+    <emulator>RetroArch</emulator>
+    <path>res://roms/nes</path>
+    <model>res://models/nes.tscn</model>
+  </system>
+  <system>
+    <name>SNES</name>
+    <emulator>RetroArch</emulator>
+    <path>res://roms/snes</path>
+    <model>res://models/snes.tscn</model>
+  </system>
+  <system>
+    <name>Nintendo GameCube</name>
+    <emulator>RetroArch</emulator>
+    <path>res://roms/gc</path>
+    <model>res://models/gamecube.tscn</model>
+  </system>    
+  <system>
+    <name>Nintendo Wii</name>
+    <emulator>RetroArch</emulator>
+    <path>res://roms/wii</path>
+    <model>res://models/wii.tscn</model>
+  </system>  
+  <system>
+    <name>Mega Drive</name>
+    <emulator>Kega Fusion</emulator>
+    <path>res://roms/Sega Mega Drive</path>
+    <model>res://models/megadrive/scene.gltf</model>
+  </system>
+  <system>
+    <name>PlayStation</name>
+    <emulator>DuckStation</emulator>
+    <path>res://roms/ps1</path>
+    <model>res://models/playstation.tscn</model>
+  </system>
+  <system>
+    <name>PlayStation 2</name>
+    <emulator>DuckStation</emulator>
+    <path>res://roms/ps2</path>
+    <model>res://models/playstation_2.tscn</model>
+  </system>  
+  <system>
+    <name>Nintendo 64</name>
+    <emulator>Mupen64Plus</emulator>
+    <path>res://roms/n64</path>
+    <model>res://models/n64.tscn</model>
+  </system>
+  <system>
+    <name>Nintendo Switch</name>
+    <emulator>Eden</emulator>
+    <path>res://roms/Nintendo Switch</path>
+    <model>res://models/switch/scene.gltf</model>
+  </system>
+</systems>

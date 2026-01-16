@@ -1,0 +1,36 @@
+[gd_scene load_steps=6 format=3]
+
+[sub_resource type="BoxMesh" id="BoxMesh_1"]
+size = Vector3(1.6, 0.25, 0.9)
+
+[sub_resource type="BoxMesh" id="BoxMesh_2"]
+size = Vector3(1.0, 0.1, 0.6)
+
+[sub_resource type="BoxMesh" id="BoxMesh_3"]
+size = Vector3(0.4, 0.05, 0.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
+albedo_color = Color(0.08, 0.08, 0.08, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2"]
+albedo_color = Color(0.2, 0.2, 0.2, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3"]
+albedo_color = Color(0.7, 0.05, 0.05, 1)
+
+[node name="MegaDriveModel" type="Node3D"]
+
+[node name="Base" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_1")
+material_override = SubResource("StandardMaterial3D_1")
+position = Vector3(0, 0.125, 0)
+
+[node name="Top" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_2")
+material_override = SubResource("StandardMaterial3D_2")
+position = Vector3(0, 0.28, 0)
+
+[node name="Accent" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_3")
+material_override = SubResource("StandardMaterial3D_3")
+position = Vector3(0.45, 0.26, 0.25)

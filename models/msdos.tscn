@@ -1,0 +1,33 @@
+[gd_scene load_steps=5 format=3]
+
+[sub_resource type="BoxMesh" id="BoxMesh_1"]
+size = Vector3(0.9, 0.6, 0.4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_2"]
+size = Vector3(0.7, 0.4, 0.05)
+
+[sub_resource type="BoxMesh" id="BoxMesh_3"]
+size = Vector3(0.4, 0.8, 0.4)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
+albedo_color = Color(0.8, 0.78, 0.7, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2"]
+albedo_color = Color(0.1, 0.2, 0.1, 1)
+
+[node name="MSDOSModel" type="Node3D"]
+
+[node name="Monitor" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_1")
+material_override = SubResource("StandardMaterial3D_1")
+position = Vector3(-0.25, 0.3, 0)
+
+[node name="Screen" type="MeshInstance3D" parent="Monitor"]
+mesh = SubResource("BoxMesh_2")
+material_override = SubResource("StandardMaterial3D_2")
+position = Vector3(0, 0.0, 0.23)
+
+[node name="Tower" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_3")
+material_override = SubResource("StandardMaterial3D_1")
+position = Vector3(0.45, 0.4, 0)

@@ -1,0 +1,40 @@
+[gd_scene load_steps=4 format=3]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_1"]
+top_radius = 0.65
+bottom_radius = 0.65
+height = 0.2
+radial_segments = 20
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_2"]
+top_radius = 0.55
+bottom_radius = 0.55
+height = 0.08
+radial_segments = 20
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
+albedo_color = Color(0.75, 0.75, 0.75, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2"]
+albedo_color = Color(0.2, 0.2, 0.2, 1)
+
+[node name="SegaSaturnModel" type="Node3D"]
+
+[node name="Base" type="MeshInstance3D" parent="."]
+mesh = SubResource("CylinderMesh_1")
+material_override = SubResource("StandardMaterial3D_1")
+position = Vector3(0, 0.1, 0)
+rotation_degrees = Vector3(90, 0, 0)
+
+[node name="Top" type="MeshInstance3D" parent="."]
+mesh = SubResource("CylinderMesh_2")
+material_override = SubResource("StandardMaterial3D_1")
+position = Vector3(0, 0.22, 0)
+rotation_degrees = Vector3(90, 0, 0)
+
+[node name="Button" type="MeshInstance3D" parent="."]
+mesh = SubResource("CylinderMesh_2")
+material_override = SubResource("StandardMaterial3D_2")
+position = Vector3(0.35, 0.22, 0.3)
+rotation_degrees = Vector3(90, 0, 0)
+scale = Vector3(0.35, 0.35, 0.35)

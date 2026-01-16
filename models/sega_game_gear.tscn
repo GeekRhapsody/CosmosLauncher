@@ -1,0 +1,38 @@
+[gd_scene load_steps=5 format=3]
+
+[sub_resource type="BoxMesh" id="BoxMesh_1"]
+size = Vector3(1.6, 0.5, 0.35)
+
+[sub_resource type="BoxMesh" id="BoxMesh_2"]
+size = Vector3(0.8, 0.3, 0.05)
+
+[sub_resource type="BoxMesh" id="BoxMesh_3"]
+size = Vector3(0.12, 0.06, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
+albedo_color = Color(0.12, 0.12, 0.12, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2"]
+albedo_color = Color(0.05, 0.2, 0.05, 1)
+
+[node name="SegaGameGearModel" type="Node3D"]
+
+[node name="Body" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_1")
+material_override = SubResource("StandardMaterial3D_1")
+position = Vector3(0, 0.25, 0)
+
+[node name="Screen" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_2")
+material_override = SubResource("StandardMaterial3D_2")
+position = Vector3(0, 0.32, 0.2)
+
+[node name="ButtonA" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_3")
+material_override = SubResource("StandardMaterial3D_1")
+position = Vector3(0.55, 0.2, 0.2)
+
+[node name="ButtonB" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_3")
+material_override = SubResource("StandardMaterial3D_1")
+position = Vector3(0.42, 0.16, 0.2)

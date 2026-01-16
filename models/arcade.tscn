@@ -1,0 +1,33 @@
+[gd_scene load_steps=5 format=3]
+
+[sub_resource type="BoxMesh" id="BoxMesh_1"]
+size = Vector3(0.9, 1.5, 0.7)
+
+[sub_resource type="BoxMesh" id="BoxMesh_2"]
+size = Vector3(0.5, 0.4, 0.05)
+
+[sub_resource type="BoxMesh" id="BoxMesh_3"]
+size = Vector3(0.6, 0.15, 0.05)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
+albedo_color = Color(0.1, 0.1, 0.12, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2"]
+albedo_color = Color(0.9, 0.2, 0.2, 1)
+
+[node name="ArcadeModel" type="Node3D"]
+
+[node name="Cabinet" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_1")
+material_override = SubResource("StandardMaterial3D_1")
+position = Vector3(0, 0.75, 0)
+
+[node name="Screen" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_2")
+material_override = SubResource("StandardMaterial3D_2")
+position = Vector3(0, 1.05, 0.33)
+
+[node name="Marquee" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_3")
+material_override = SubResource("StandardMaterial3D_2")
+position = Vector3(0, 1.35, 0.33)

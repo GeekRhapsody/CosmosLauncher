@@ -1,0 +1,49 @@
+[gd_scene load_steps=7 format=3]
+
+[sub_resource type="BoxMesh" id="BoxMesh_1"]
+size = Vector3(1.3, 0.6, 0.35)
+
+[sub_resource type="BoxMesh" id="BoxMesh_2"]
+size = Vector3(0.5, 0.25, 0.05)
+
+[sub_resource type="BoxMesh" id="BoxMesh_3"]
+size = Vector3(0.16, 0.05, 0.16)
+
+[sub_resource type="BoxMesh" id="BoxMesh_4"]
+size = Vector3(0.12, 0.05, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
+albedo_color = Color(0.75, 0.75, 0.75, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2"]
+albedo_color = Color(0.1, 0.2, 0.1, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3"]
+albedo_color = Color(0.2, 0.2, 0.2, 1)
+
+[node name="GameBoyAdvanceModel" type="Node3D"]
+
+[node name="Body" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_1")
+material_override = SubResource("StandardMaterial3D_1")
+position = Vector3(0, 0.3, 0)
+
+[node name="Screen" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_2")
+material_override = SubResource("StandardMaterial3D_2")
+position = Vector3(0, 0.45, 0.2)
+
+[node name="DPad" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_3")
+material_override = SubResource("StandardMaterial3D_3")
+position = Vector3(-0.45, 0.18, 0.2)
+
+[node name="ButtonA" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_4")
+material_override = SubResource("StandardMaterial3D_3")
+position = Vector3(0.45, 0.18, 0.2)
+
+[node name="ButtonB" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_4")
+material_override = SubResource("StandardMaterial3D_3")
+position = Vector3(0.35, 0.12, 0.2)

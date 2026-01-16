@@ -1,0 +1,89 @@
+[gd_scene load_steps=6 format=3]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_1"]
+top_radius = 0.35
+bottom_radius = 0.35
+height = 0.08
+radial_segments = 12
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_2"]
+top_radius = 0.25
+bottom_radius = 0.25
+height = 0.08
+radial_segments = 12
+
+[sub_resource type="BoxMesh" id="BoxMesh_1"]
+size = Vector3(0.08, 0.04, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
+albedo_color = Color(0.7, 0.7, 0.75, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2"]
+albedo_color = Color(0.3, 0.3, 0.35, 1)
+
+[node name="SettingsCogs" type="Node3D"]
+
+[node name="CogLarge" type="Node3D" parent="."]
+position = Vector3(-0.35, 0.2, 0)
+
+[node name="Disk" type="MeshInstance3D" parent="CogLarge"]
+mesh = SubResource("CylinderMesh_1")
+material_override = SubResource("StandardMaterial3D_1")
+rotation_degrees = Vector3(90, 0, 0)
+
+[node name="ToothN" type="MeshInstance3D" parent="CogLarge"]
+mesh = SubResource("BoxMesh_1")
+material_override = SubResource("StandardMaterial3D_2")
+position = Vector3(0, 0.42, 0)
+rotation_degrees = Vector3(90, 0, 0)
+
+[node name="ToothS" type="MeshInstance3D" parent="CogLarge"]
+mesh = SubResource("BoxMesh_1")
+material_override = SubResource("StandardMaterial3D_2")
+position = Vector3(0, -0.42, 0)
+rotation_degrees = Vector3(90, 0, 0)
+
+[node name="ToothE" type="MeshInstance3D" parent="CogLarge"]
+mesh = SubResource("BoxMesh_1")
+material_override = SubResource("StandardMaterial3D_2")
+position = Vector3(0.42, 0, 0)
+rotation_degrees = Vector3(90, 0, 0)
+
+[node name="ToothW" type="MeshInstance3D" parent="CogLarge"]
+mesh = SubResource("BoxMesh_1")
+material_override = SubResource("StandardMaterial3D_2")
+position = Vector3(-0.42, 0, 0)
+rotation_degrees = Vector3(90, 0, 0)
+
+[node name="CogSmall" type="Node3D" parent="."]
+position = Vector3(0.35, 0.1, 0)
+rotation_degrees = Vector3(0, 0, 20)
+
+[node name="Disk" type="MeshInstance3D" parent="CogSmall"]
+mesh = SubResource("CylinderMesh_2")
+material_override = SubResource("StandardMaterial3D_1")
+rotation_degrees = Vector3(90, 0, 0)
+
+[node name="ToothN" type="MeshInstance3D" parent="CogSmall"]
+mesh = SubResource("BoxMesh_1")
+material_override = SubResource("StandardMaterial3D_2")
+position = Vector3(0, 0.32, 0)
+rotation_degrees = Vector3(90, 0, 0)
+
+[node name="ToothS" type="MeshInstance3D" parent="CogSmall"]
+mesh = SubResource("BoxMesh_1")
+material_override = SubResource("StandardMaterial3D_2")
+position = Vector3(0, -0.32, 0)
+rotation_degrees = Vector3(90, 0, 0)
+
+[node name="ToothE" type="MeshInstance3D" parent="CogSmall"]
+mesh = SubResource("BoxMesh_1")
+material_override = SubResource("StandardMaterial3D_2")
+position = Vector3(0.32, 0, 0)
+rotation_degrees = Vector3(90, 0, 0)
+
+[node name="ToothW" type="MeshInstance3D" parent="CogSmall"]
+mesh = SubResource("BoxMesh_1")
+material_override = SubResource("StandardMaterial3D_2")
+position = Vector3(-0.32, 0, 0)
+rotation_degrees = Vector3(90, 0, 0)

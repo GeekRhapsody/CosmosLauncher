@@ -1,0 +1,27 @@
+[gd_scene load_steps=2 format=3 uid="uid://yq3e6b2w6wrv"]
+
+[ext_resource type="Script" path="res://grid_root.gd" id="1"]
+
+[node name="GridRoot" type="Node3D"]
+script = ExtResource("1")
+
+[node name="GridContainer" type="Node3D" parent="."]
+
+[node name="Camera3D" type="Camera3D" parent="."]
+position = Vector3(0, 6, 12)
+rotation_degrees = Vector3(-25, 0, 0)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-45, 45, 0)
+
+[node name="UILayer" type="CanvasLayer" parent="."]
+
+[node name="SelectedLabel" type="Label" parent="UILayer"]
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 300.0
+offset_bottom = 48.0
+text = ""
